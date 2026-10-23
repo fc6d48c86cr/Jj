@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="sv" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Materiallära: Polyester vs Polyamid</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            polyester: {
+              light: '#38bdf8',
+              DEFAULT: '#0284c7',
+              dark: '#0369a1',
+              glow: 'rgba(56, 189, 248, 0.25)'
+            },
+            nylon: {
+              light: '#c084fc',
+              DEFAULT: '#9333ea',
+              dark: '#7e22ce',
+              glow: 'rgba(192, 132, 252, 0.25)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Bakgrund med subtil textil- och fibervävsmönster */
+    .fiber-pattern {
+      background-color: #0b0f19;
+      background-image: 
+        radial-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+        radial-gradient(rgba(192, 132, 252, 0.08) 1px, transparent 1px);
+      background-size: 32px 32px;
+      background-position: 0 0, 16px 16px;
+    }
+    
+    /* Mjuka övergångar för slidebyten */
+    .slide-panel {
+      transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .slide-panel.hidden-slide {
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      transform: scale(0.98) translateY(12px);
+    }
+    .slide-panel.active-slide {
+      opacity: 1;
+      pointer-events: auto;
+      position: relative;
+      transform: scale(1) translateY(0);
+    }
+
+    /* Animerade ringmätare */
+    .gauge-circle {
+      stroke-dashoffset: 440;
+      transition: stroke-dashoffset 1.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* Skräddarsydd skrollbar för interaktiva kort */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.25);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.45);
+    }
+  </style>
+</head>
+<body class="fiber-pattern text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white">
+
+  <!-- TOPPNAVIGERING & HEADER -->
+  <header class="border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-8 py-3.5 transition-all">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Ämnestitel & Kursinfo -->
+      <div class="flex items-center space-x-3">
+        <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+        </div>
+        <div>
+          <span class="text-xs font-semibold tracking-wider uppercase text-sky-400">Materiallära &bull; Syntetiska Textilier</span>
+          <h1 class="text-sm md:text-base font-bold text-white tracking-tight">Oljebaserade Fibrer</h1>
+        </div>
+      </div>
+
+      <!-- Slide-väljare (Flikar) -->
+      <nav class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800 shadow-inner">
+        <button onclick="goToSlide(0)" id="tab-0" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 flex items-center gap-2 text-white bg-slate-800 shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+          <span>1. Polyester</span>
+        </button>
+        <button onclick="goToSlide(1)" id="tab-1" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+          <span>2. Polyamid</span>
+        </button>
+        <button onclick="goToSlide(2)" id="tab-2" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          <span>3. Jämförelse</span>
+        </button>
+      </nav>
+
+      <!-- Snabbknappar & Tangentbords-tips -->
+      <div class="hidden sm:flex items-center space-x-2 text-xs text-slate-400">
+        <span class="px-2 py-1 rounded bg-slate-900 border border-slate-800 font-mono text-[11px]">←</span>
+        <span class="px-2 py-1 rounded bg-slate-900 border border-slate-800 font-mono text-[11px]">→</span>
+        <span class="text-slate-500">för att navigera</span>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- HUVUDINNEHÅLL / SLIDES -->
+  <main class="max-w-7xl mx-auto w-full px-4 lg:px-8 py-6 flex-grow flex items-center justify-center">
+
+    <!-- ============================================== -->
+    <!-- SLIDE 1: POLYESTER (Slide 2 i presentationen) -->
+    <!-- ============================================== -->
+    <section id="slide-0" class="slide-panel active-slide w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- Vänster kolumn: Introduktion & Marknadsdominans -->
+        <div class="lg:col-span-5 flex flex-col justify-between bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-sky-900/30 rounded-3xl p-6 md:p-8 backdrop-blur-sm relative overflow-hidden shadow-2xl">
+          <div class="absolute -top-24 -left-24 w-60 h-60 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-950 border border-sky-500/30 text-sky-300 text-xs font-semibold mb-4">
+              <span class="flex h-2 w-2 rounded-full bg-sky-400 animate-pulse"></span>
+              Slide 2 &bull; Världens mest producerade fiber
+            </div>
+            
+            <h2 class="text-3xl md:text-5xl font-black text-white tracking-tight mb-2">
+              Polyester
+            </h2>
+            <p class="text-slate-400 text-sm md:text-base leading-relaxed mb-6">
+              En helsyntetisk fiber som tillverkas industriellt genom polymerisation av petroleum (råolja). Den absoluta dominanten i modern textilindustri.
+            </p>
+          </div>
+
+          <!-- Stor Mätare: 59% Marknadsandel -->
+          <div class="bg-slate-950/70 border border-slate-800/80 rounded-2xl p-5 my-3 relative overflow-hidden">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold block mb-1">Global Marknadsandel</span>
+                <div class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-teal-300 font-mono">
+                  59 %
+                </div>
+                <p class="text-xs text-slate-400 mt-1">av hela världens samlade textilproduktion</p>
+              </div>
+
+              <!-- Cirkel SVG Gauge -->
+              <div class="relative w-24 h-24 flex-shrink-0 flex items-center justify-center">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="70" stroke="currentColor" stroke-width="14" class="text-slate-800" fill="transparent" />
+                  <circle id="poly-market-gauge" cx="80" cy="80" r="70" stroke="currentColor" stroke-width="14" 
+                    stroke-dasharray="440" stroke-dashoffset="440" stroke-linecap="round"
+                    class="gauge-circle text-sky-400" fill="transparent" />
+                </svg>
+                <span class="absolute text-xs font-mono font-bold text-sky-300">59%</span>
+              </div>
+            </div>
+
+            <!-- Jämförelsevisande stapel för kontext -->
+            <div class="w-full bg-slate-800 h-2 rounded-full mt-4 overflow-hidden flex">
+              <div class="bg-sky-400 h-full transition-all duration-1000" style="width: 59%" title="Polyester: 59%"></div>
+              <div class="bg-emerald-500 h-full" style="width: 24%" title="Bomull: ca 24%"></div>
+              <div class="bg-purple-500 h-full" style="width: 5%" title="Polyamid: 5%"></div>
+              <div class="bg-slate-600 h-full" style="width: 12%" title="Övriga fibrer: 12%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+              <span class="text-sky-400">Polyester 59%</span>
+              <span>Bomull ~24%</span>
+              <span class="text-purple-400">Polyamid 5%</span>
+              <span>Övrigt</span>
+            </div>
+          </div>
+
+          <!-- Ursprungs-badge -->
+          <div class="flex items-center gap-3 pt-3 text-xs text-slate-400 border-t border-slate-800/80">
+            <div class="p-2 rounded-lg bg-sky-950/60 border border-sky-800/40 text-sky-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="font-semibold text-slate-200">Syntetfiber från fossil råolja</p>
+              <p class="text-[11px] text-slate-400">Polymeriseras främst som polyetentereftalat (PET)</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Höger kolumn: Egenskaper, Användning & Återvinning -->
+        <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+          
+          <!-- Egenskaper (4 interaktiva kort) -->
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+              Framträdande Egenskaper
+            </h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <!-- Kort 1 -->
+              <div class="bg-slate-900/80 border border-slate-800 hover:border-sky-500/50 p-3.5 rounded-2xl transition group cursor-default">
+                <div class="w-8 h-8 rounded-lg bg-sky-950/80 text-sky-400 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                  </svg>
+                </div>
+                <h4 class="text-sm font-semibold text-white">Mycket slitstarkt</h4>
+                <p class="text-xs text-slate-400 mt-1">Hög draghållfasthet och lång teknisk livslängd.</p>
+              </div>
+
+              <!-- Kort 2 -->
+              <div class="bg-slate-900/80 border border-slate-800 hover:border-sky-500/50 p-3.5 rounded-2xl transition group cursor-default">
+                <div class="w-8 h-8 rounded-lg bg-sky-950/80 text-sky-400 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                  </svg>
+                </div>
+                <h4 class="text-sm font-semibold text-white">Krymper inte</h4>
+                <p class="text-xs text-slate-400 mt-1">Behåller dimensioner och passform även efter tvätt.</p>
+              </div>
+
+              <!-- Kort 3 -->
+              <div class="bg-slate-900/80 border border-slate-800 hover:border-sky-500/50 p-3.5 rounded-2xl transition group cursor-default">
+                <div class="w-8 h-8 rounded-lg bg-sky-950/80 text-sky-400 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                  </svg>
+                </div>
+                <h4 class="text-sm font-semibold text-white">Skrynklar inte</h4>
+                <p class="text-xs text-slate-400 mt-1">Hög formstabilitet som nästan eliminerar strykbehov.</p>
+              </div>
+
+              <!-- Kort 4 -->
+              <div class="bg-slate-900/80 border border-slate-800 hover:border-sky-500/50 p-3.5 rounded-2xl transition group cursor-default">
+                <div class="w-8 h-8 rounded-lg bg-sky-950/80 text-sky-400 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                  </svg>
+                </div>
+                <h4 class="text-sm font-semibold text-white">Torkar snabbt</h4>
+                <p class="text-xs text-slate-400 mt-1">Hydrofoba fibrer absorberar nästan ingen fukt.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Användningsområden -->
+          <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 block">Vanliga Användningsområden</span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div class="flex items-center gap-2 p-2 rounded-xl bg-slate-950/50 border border-slate-800 text-xs text-slate-200">
+                <span class="text-amber-400">⚡</span>
+                <span class="font-medium">Fast fashion</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-xl bg-slate-950/50 border border-slate-800 text-xs text-slate-200">
+                <span class="text-sky-400">👕</span>
+                <span class="font-medium">Vardagsplagg</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-xl bg-slate-950/50 border border-slate-800 text-xs text-slate-200">
+                <span class="text-emerald-400">🏃</span>
+                <span class="font-medium">Träningskläder</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-xl bg-slate-950/50 border border-slate-800 text-xs text-slate-200">
+                <span class="text-purple-400">🛋️</span>
+                <span class="font-medium">Hemtextil</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Återvinning & Cirkularitet (Highlight Card) -->
+          <div class="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-sky-950/40 border border-emerald-800/40 rounded-2xl p-4 md:p-5 relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  <span>Återvinningsstatus</span>
+                </div>
+                <h4 class="text-base font-bold text-white">12 % är återvunnen polyester</h4>
+                <p class="text-xs text-slate-300">
+                  Den absoluta lejonparten kommer inte från uttjänta kläder, utan från flaskåtervinning:
+                </p>
+              </div>
+
+              <!-- Återvinnings-badge -->
+              <div class="bg-slate-950/80 border border-emerald-500/30 rounded-xl p-3 sm:text-right min-w-[150px]">
+                <div class="text-2xl font-black text-emerald-400 font-mono">97 %</div>
+                <div class="text-[11px] text-slate-400 leading-tight">kommer från pantade PET-flaskor</div>
+              </div>
+            </div>
+
+            <!-- Interaktiv Flaska till Tröja visualisering -->
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center gap-3 text-xs text-slate-400">
+              <span class="text-base">🍾</span>
+              <span class="text-slate-500">→</span>
+              <span class="text-base">⚙️</span>
+              <span class="text-slate-500">→</span>
+              <span class="text-base">🧵</span>
+              <span class="text-slate-500">→</span>
+              <span class="text-base">👕</span>
+              <span class="text-[11px] text-slate-300 ml-auto italic">"Bottle-to-fiber" är marknadens vanligaste cirkulära metod.</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SLIDE 2: POLYAMID (Slide 3 i presentationen) -->
+    <!-- ============================================== -->
+    <section id="slide-1" class="slide-panel hidden-slide w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- Vänster kolumn: Introduktion & Historia -->
+        <div class="lg:col-span-5 flex flex-col justify-between bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-purple-900/30 rounded-3xl p-6 md:p-8 backdrop-blur-sm relative overflow-hidden shadow-2xl">
+          <div class="absolute -top-24 -left-24 w-60 h-60 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950 border border-purple-500/30 text-purple-300 text-xs font-semibold mb-4">
+              <span class="flex h-2 w-2 rounded-full bg-purple-400 animate-pulse"></span>
+              Slide 3 &bull; Klassiskt känd som Nylon
+            </div>
+            
+            <h2 class="text-3xl md:text-5xl font-black text-white tracking-tight mb-2">
+              Polyamid
+            </h2>
+            <p class="text-slate-400 text-sm md:text-base leading-relaxed mb-6">
+              Tillverkas också av fossil råolja. Lanserades kommersiellt <strong class="text-purple-300">1938</strong> av kemikoncernen DuPont och revolutionerade textilvärlden, inte minst genom nylonstrumpan.
+            </p>
+          </div>
+
+          <!-- Mätare: 5% Marknadsandel -->
+          <div class="bg-slate-950/70 border border-slate-800/80 rounded-2xl p-5 my-3 relative overflow-hidden">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold block mb-1">Global Marknadsandel</span>
+                <div class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300 font-mono">
+                  5 %
+                </div>
+                <p class="text-xs text-slate-400 mt-1">av den globala fibermarknaden</p>
+              </div>
+
+              <!-- Cirkel SVG Gauge -->
+              <div class="relative w-24 h-24 flex-shrink-0 flex items-center justify-center">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="70" stroke="currentColor" stroke-width="14" class="text-slate-800" fill="transparent" />
+                  <circle id="nylon-market-gauge" cx="80" cy="80" r="70" stroke="currentColor" stroke-width="14" 
+                    stroke-dasharray="440" stroke-dashoffset="440" stroke-linecap="round"
+                    class="gauge-circle text-purple-400" fill="transparent" />
+                </svg>
+                <span class="absolute text-xs font-mono font-bold text-purple-300">5%</span>
+              </div>
+            </div>
+
+            <!-- Jämförelsereferens -->
+            <div class="w-full bg-slate-800 h-2 rounded-full mt-4 overflow-hidden flex">
+              <div class="bg-purple-500 h-full" style="width: 5%" title="Polyamid: 5%"></div>
+              <div class="bg-slate-700 h-full" style="width: 95%" title="Resterande fibermarknad: 95%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+              <span class="text-purple-400">Polyamid (5%)</span>
+              <span>Dyr och teknisk specialfiber (95% övrigt)</span>
+            </div>
+          </div>
+
+          <!-- Historisk tidsstämpel -->
+          <div class="flex items-center gap-3 pt-3 text-xs text-slate-400 border-t border-slate-800/80">
+            <div class="p-2 rounded-lg bg-purple-950/60 border border-purple-800/40 text-purple-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="font-semibold text-slate-200">1938 &bull; Världens första helsyntetiska fiber</p>
+              <p class="text-[11px] text-slate-400">Ersatte silke i fallskärmar och damstrumpor under 1940-talet.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Höger kolumn: Egenskaper, Användningsområden & Återvinning -->
+        <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+          
+          <!-- Huvudegenskaper: Elasticitet vs Nötningsbeständighet -->
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+              <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+              </svg>
+              Överlägsna Egenskaper (Jämfört med Polyester)
+            </h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <!-- Egenskap 1: Elasticitet -->
+              <div class="bg-slate-900/80 border border-slate-800 hover:border-purple-500/50 p-4 rounded-2xl transition">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-9 h-9 rounded-xl bg-purple-950 text-purple-400 flex items-center justify-center font-bold">
+                    ⟷
+                  </div>
+                  <div>
+                    <h4 class="text-base font-bold text-white">Mer elastiskt</h4>
+                    <span class="text-xs text-purple-400 font-medium">Överlägsen återfjädring</span>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Har naturligt högre flexibilitet och förmåga att sträckas ut och sedan återfå sin ursprungliga form utan att slappas ur.
+                </p>
+              </div>
+
+              <!-- Egenskap 2: Nötningsbeständighet -->
+              <div class="bg-slate-900/80 border border-slate-800 hover:border-purple-500/50 p-4 rounded-2xl transition">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-9 h-9 rounded-xl bg-purple-950 text-purple-400 flex items-center justify-center font-bold">
+                    🛡️
+                  </div>
+                  <div>
+                    <h4 class="text-base font-bold text-white">Mer nötningsbeständigt</h4>
+                    <span class="text-xs text-purple-400 font-medium">Marknadens högsta friktionstålighet</span>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Tål mekanisk nötning och skrapning bättre än något annat vanligt klädmaterial (t.ex. i ryggsäcksbottnar och ytterkläder).
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Användningsområden -->
+          <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 block">Klassiska och Krävande Användningsområden</span>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <div class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-950/50 border border-slate-800 text-xs text-slate-200">
+                <span class="text-sky-400">🧗</span>
+                <span class="font-medium">Sport- & regnkläder</span>
+              </div>
+              <div class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-950/50 border border-slate-800 text-xs text-slate-200">
+                <span class="text-pink-400">🧦</span>
+                <span class="font-medium">Nylonstrumpor</span>
+              </div>
+              <div class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-950/50 border border-slate-800 text-xs text-slate-200">
+                <span class="text-purple-400">🩲</span>
+                <span class="font-medium">Underkläder</span>
+              </div>
+              <div class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-950/50 border border-slate-800 text-xs text-slate-200">
+                <span class="text-amber-400">🎒</span>
+                <span class="font-medium">Ryggsäckar & väskor</span>
+              </div>
+              <div class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-950/50 border border-slate-800 text-xs text-slate-200 col-span-2 sm:col-span-2">
+                <span class="text-emerald-400">🪂</span>
+                <span class="font-medium">Fallskärmar, rep & tält</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Återvinning (Utmaningen) -->
+          <div class="bg-gradient-to-r from-amber-950/40 via-slate-900 to-purple-950/40 border border-amber-800/40 rounded-2xl p-4 md:p-5 relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                  </svg>
+                  <span>Återvinningsutmaningen</span>
+                </div>
+                <h4 class="text-base font-bold text-white">Återvinning: Cirka 3 %</h4>
+                <p class="text-xs text-slate-300">
+                  Till skillnad från polyester saknas en massiv separat återvinningsström som pantsystem för PET-flaskor.
+                </p>
+              </div>
+
+              <!-- Återvinnings-badge -->
+              <div class="bg-slate-950/80 border border-amber-500/30 rounded-xl p-3 sm:text-right min-w-[150px]">
+                <div class="text-2xl font-black text-amber-400 font-mono">~3 %</div>
+                <div class="text-[11px] text-slate-400 leading-tight">återvinns globalt idag</div>
+              </div>
+            </div>
+
+            <div class="mt-3 pt-3 border-t border-slate-800/80 text-[11px] text-slate-400">
+              💡 <span class="text-slate-300 font-medium">Framsteg sker:</span> Återvunnen polyamid tas idag bland annat fram ur kasserade fiskenät och industriellt spill (t.ex. ECONYL®).
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SLIDE 3: INTERAKTIV JÄMFÖRELSE (Polyester vs Polyamid) -->
+    <!-- ============================================== -->
+    <section id="slide-2" class="slide-panel hidden-slide w-full">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-sm shadow-2xl relative">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 pb-4 border-b border-slate-800 gap-3">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 text-amber-300 text-xs font-semibold mb-2">
+              <span>⚔️</span> Direkt jämförelse mellan Slide 2 &amp; Slide 3
+            </div>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-white">
+              Polyester <span class="text-slate-500 font-light">vs</span> Polyamid
+            </h2>
+          </div>
+          <p class="text-xs md:text-sm text-slate-400 max-w-md">
+            Båda föds ur råolja, men de har helt olika marknadsroller och styrkor i modern textilproduktion.
+          </p>
+        </div>
+
+        <!-- Mätare & Stapeldiagram -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          
+          <!-- Metrik 1: Marknadsandel -->
+          <div class="bg-slate-950/60 border border-slate-800/80 p-5 rounded-2xl">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs uppercase font-bold tracking-wider text-slate-400">Global Marknadsandel</span>
+              <span class="text-xs text-sky-400 font-mono font-bold">59% vs 5%</span>
+            </div>
+            
+            <!-- Polyester bar -->
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-sky-300 font-medium flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span> Polyester
+                </span>
+                <span class="font-mono font-bold text-white">59 %</span>
+              </div>
+              <div class="w-full bg-slate-800 h-3.5 rounded-full overflow-hidden p-0.5">
+                <div class="bg-gradient-to-r from-sky-500 to-teal-400 h-full rounded-full transition-all duration-1000" style="width: 59%"></div>
+              </div>
+            </div>
+
+            <!-- Polyamid bar -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-purple-300 font-medium flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span> Polyamid
+                </span>
+                <span class="font-mono font-bold text-white">5 %</span>
+              </div>
+              <div class="w-full bg-slate-800 h-3.5 rounded-full overflow-hidden p-0.5">
+                <div class="bg-gradient-to-r from-purple-500 to-pink-400 h-full rounded-full transition-all duration-1000" style="width: 5%"></div>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-slate-400 mt-3 italic">
+              Polyester produceras i nästan 12 gånger större volym tack vare extremt lågt råvarupris och snabb tillverkning.
+            </p>
+          </div>
+
+          <!-- Metrik 2: Återvinningsgrad -->
+          <div class="bg-slate-950/60 border border-slate-800/80 p-5 rounded-2xl">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs uppercase font-bold tracking-wider text-slate-400">Global Återvinningsgrad</span>
+              <span class="text-xs text-emerald-400 font-mono font-bold">12% vs 3%</span>
+            </div>
+
+            <!-- Polyester återvinning bar -->
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-sky-300 font-medium flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Polyester (97% pantflaskor)
+                </span>
+                <span class="font-mono font-bold text-white">12 %</span>
+              </div>
+              <div class="w-full bg-slate-800 h-3.5 rounded-full overflow-hidden p-0.5">
+                <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-1000" style="width: 12%"></div>
+              </div>
+            </div>
+
+            <!-- Polyamid återvinning bar -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-purple-300 font-medium flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Polyamid (Fiskenät, spill)
+                </span>
+                <span class="font-mono font-bold text-white">~3 %</span>
+              </div>
+              <div class="w-full bg-slate-800 h-3.5 rounded-full overflow-hidden p-0.5">
+                <div class="bg-gradient-to-r from-amber-500 to-orange-400 h-full rounded-full transition-all duration-1000" style="width: 3%"></div>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-slate-400 mt-3 italic">
+              Textil-till-textil-återvinning är fortfarande under 1% för båda, men Polyester drar nytta av befintlig PET-infrastruktur.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Egenskapsmatris med klickbar interaktiv simulator -->
+        <div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Interaktiv Simulator: Vilket material väljs och varför?
+            </h3>
+            <span class="text-xs text-slate-500">Klicka på en produkt nedan för att se materialvalet:</span>
+          </div>
+
+          <!-- Klickbara produkter -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+            <button onclick="selectProduct('backpack')" id="btn-backpack" class="sim-btn p-3 rounded-xl border border-purple-500/60 bg-purple-950/40 text-left transition hover:bg-slate-800">
+              <span class="text-lg block mb-1">🎒</span>
+              <div class="text-xs font-bold text-white">Expeditionsryggsäck</div>
+              <div class="text-[10px] text-purple-300 font-medium">Polyamid vinner</div>
+            </button>
+            <button onclick="selectProduct('fastfashion')" id="btn-fastfashion" class="sim-btn p-3 rounded-xl border border-slate-800 bg-slate-950/50 text-left transition hover:bg-slate-800">
+              <span class="text-lg block mb-1">👗</span>
+              <div class="text-xs font-bold text-white">Vardagsklänning</div>
+              <div class="text-[10px] text-sky-300 font-medium">Polyester vinner</div>
+            </button>
+            <button onclick="selectProduct('stockings')" id="btn-stockings" class="sim-btn p-3 rounded-xl border border-slate-800 bg-slate-950/50 text-left transition hover:bg-slate-800">
+              <span class="text-lg block mb-1">🧦</span>
+              <div class="text-xs font-bold text-white">Finstrumpor</div>
+              <div class="text-[10px] text-purple-300 font-medium">Polyamid vinner</div>
+            </button>
+            <button onclick="selectProduct('curtains')" id="btn-curtains" class="sim-btn p-3 rounded-xl border border-slate-800 bg-slate-950/50 text-left transition hover:bg-slate-800">
+              <span class="text-lg block mb-1">🛋️</span>
+              <div class="text-xs font-bold text-white">Hemgardin & Klädsel</div>
+              <div class="text-[10px] text-sky-300 font-medium">Polyester vinner</div>
+            </button>
+          </div>
+
+          <!-- Simulatorns förklaringsruta -->
+          <div id="sim-explanation" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs leading-relaxed transition-all">
+            <!-- Dynamiskt innehåll via JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- PRESENTATIONSKONTROLLER (NEDERST) -->
+  <footer class="border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-md px-4 lg:px-8 py-3.5 z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <!-- Föregående-knapp -->
+      <button onclick="prevSlide()" id="prev-btn" class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white text-xs md:text-sm font-semibold flex items-center gap-2 transition disabled:opacity-40 disabled:cursor-not-allowed">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        <span>Föregående</span>
+      </button>
+
+      <!-- Paginering & Prickar -->
+      <div class="flex items-center space-x-3">
+        <button onclick="goToSlide(0)" class="dot-btn w-3 h-3 rounded-full transition-all duration-300 bg-sky-400 ring-4 ring-sky-500/20" aria-label="Gå till slide 1"></button>
+        <button onclick="goToSlide(1)" class="dot-btn w-2.5 h-2.5 rounded-full transition-all duration-300 bg-slate-700 hover:bg-slate-500" aria-label="Gå till slide 2"></button>
+        <button onclick="goToSlide(2)" class="dot-btn w-2.5 h-2.5 rounded-full transition-all duration-300 bg-slate-700 hover:bg-slate-500" aria-label="Gå till slide 3"></button>
+        <span id="slide-indicator" class="text-xs font-mono text-slate-400 ml-2 hidden sm:inline">Slide 1 av 3</span>
+      </div>
+
+      <!-- Nästa-knapp -->
+      <button onclick="nextSlide()" id="next-btn" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs md:text-sm font-semibold flex items-center gap-2 transition shadow-lg shadow-sky-600/20 disabled:opacity-40 disabled:cursor-not-allowed">
+        <span>Nästa</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT: LOGIK, ANIMATIONER OCH TANGENTBORDSNAVIGATION -->
+  <script>
+    let currentSlide = 0;
+    const totalSlides = 3;
+
+    // Data för den interaktiva materialsimulatorn
+    const productSimulations = {
+      backpack: {
+        title: "Expeditionsryggsäck",
+        winner: "Polyamid (Nylon)",
+        color: "text-purple-400",
+        borderColor: "border-purple-500/60",
+        bgBadge: "bg-purple-950 text-purple-300",
+        why: "Ryggsäckar utsätts ständigt för friktion, markkontakt och skarpa klippor. Polyamid är överlägset polyester i nötningsbeständighet och tål rivskador mycket bättre, vilket gör den till branschstandard för tekniska väskor (t.ex. Cordura®)."
+      },
+      fastfashion: {
+        title: "Vardagsklänning & Snabbmode",
+        winner: "Polyester",
+        color: "text-sky-400",
+        borderColor: "border-sky-500/60",
+        bgBadge: "bg-sky-950 text-sky-300",
+        why: "Polyester är markant billigare att framställa i jättevolymer. Den krymper inte, skrynklar inte efter tvätt och torkar på nolltid. Dessutom möjliggör den skarp och billig sublimeringstryckning av mönster."
+      },
+      stockings: {
+        title: "Finstrumpor & Trikå",
+        winner: "Polyamid",
+        color: "text-purple-400",
+        borderColor: "border-purple-500/60",
+        bgBadge: "bg-purple-950 text-purple-300",
+        why: "Nylonstrumpans genombrott 1938 byggde på polyamidens unika elasticitet och förmåga att stickas extremt tunt med fin tråd utan att brista vid knäböjningar och sträckningar."
+      },
+      curtains: {
+        title: "Hemgardin & Klädsel",
+        winner: "Polyester",
+        color: "text-sky-400",
+        borderColor: "border-sky-500/60",
+        bgBadge: "bg-sky-950 text-sky-300",
+        why: "Gardiner hänger i solljus under lång tid. Polyester har utmärkt dimensionsstabilitet (håller formen och töjs inte under tyngd) och bleks långsammare av UV-strålning jämfört med många andra synteter."
+      }
+    };
+
+    function updateSlideUI() {
+      // Hantera paneler
+      for (let i = 0; i < totalSlides; i++) {
+        const slideEl = document.getElementById(`slide-${i}`);
+        const tabEl = document.getElementById(`tab-${i}`);
+
+        if (i === currentSlide) {
+          slideEl.classList.remove('hidden-slide');
+          slideEl.classList.add('active-slide');
+
+          // Uppdatera flikstyling
+          tabEl.classList.remove('text-slate-400');
+          tabEl.classList.add('text-white', 'bg-slate-800', 'shadow-sm');
+        } else {
+          slideEl.classList.remove('active-slide');
+          slideEl.classList.add('hidden-slide');
+
+          // Återställ flikstyling
+          tabEl.classList.remove('text-white', 'bg-slate-800', 'shadow-sm');
+          tabEl.classList.add('text-slate-400');
+        }
+      }
+
+      // Uppdatera prickar
+      const dots = document.querySelectorAll('.dot-btn');
+      dots.forEach((dot, idx) => {
+        if (idx === currentSlide) {
+          dot.className = "dot-btn w-3 h-3 rounded-full transition-all duration-300 ring-4 " + 
+            (idx === 0 ? "bg-sky-400 ring-sky-500/20" : idx === 1 ? "bg-purple-400 ring-purple-500/20" : "bg-amber-400 ring-amber-500/20");
+        } else {
+          dot.className = "dot-btn w-2.5 h-2.5 rounded-full transition-all duration-300 bg-slate-700 hover:bg-slate-500";
+        }
+      });
+
+      // Uppdatera knappars tillstånd
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+      const indicator = document.getElementById('slide-indicator');
+
+      prevBtn.disabled = (currentSlide === 0);
+      nextBtn.disabled = (currentSlide === totalSlides - 1);
+
+      if (indicator) {
+        indicator.textContent = `Slide ${currentSlide + 1} av ${totalSlides}`;
+      }
+
+      // Trigga animation för ringmätare
+      animateGauges();
+    }
+
+    function animateGauges() {
+      const polyGauge = document.getElementById('poly-market-gauge');
+      const nylonGauge = document.getElementById('nylon-market-gauge');
+
+      if (currentSlide === 0 && polyGauge) {
+        // Omkrets r=70 är 2 * PI * 70 ≈ 440
+        // 59% av 440 = 259.6, offset = 440 - 259.6 = 180.4
+        polyGauge.style.strokeDashoffset = '440';
+        setTimeout(() => {
+          polyGauge.style.strokeDashoffset = '180';
+        }, 100);
+      } else if (polyGauge) {
+        polyGauge.style.strokeDashoffset = '440';
+      }
+
+      if (currentSlide === 1 && nylonGauge) {
+        // 5% av 440 = 22, offset = 440 - 22 = 418
+        nylonGauge.style.strokeDashoffset = '440';
+        setTimeout(() => {
+          nylonGauge.style.strokeDashoffset = '418';
+        }, 100);
+      } else if (nylonGauge) {
+        nylonGauge.style.strokeDashoffset = '440';
+      }
+    }
+
+    function goToSlide(index) {
+      if (index >= 0 && index < totalSlides) {
+        currentSlide = index;
+        updateSlideUI();
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlideUI();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlideUI();
+      }
+    }
+
+    // Interaktiv simulator-väljare
+    function selectProduct(key) {
+      const data = productSimulations[key];
+      if (!data) return;
+
+      // Uppdatera knappar
+      document.querySelectorAll('.sim-btn').forEach(btn => {
+        btn.classList.remove('border-purple-500/60', 'border-sky-500/60', 'bg-purple-950/40', 'bg-sky-950/40');
+        btn.classList.add('border-slate-800', 'bg-slate-950/50');
+      });
+
+      const selectedBtn = document.getElementById(`btn-${key}`);
+      if (selectedBtn) {
+        selectedBtn.classList.remove('border-slate-800', 'bg-slate-950/50');
+        if (data.winner.includes('Polyester')) {
+          selectedBtn.classList.add('border-sky-500/60', 'bg-sky-950/40');
+        } else {
+          selectedBtn.classList.add('border-purple-500/60', 'bg-purple-950/40');
+        }
+      }
+
+      // Rendera förklaringsruta
+      const container = document.getElementById('sim-explanation');
+      container.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs uppercase font-mono tracking-wider text-slate-400">Valt plagg:</span>
+            <span class="font-bold text-white text-sm">${data.title}</span>
+          </div>
+          <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${data.bgBadge} border border-current/20">
+            Valt material: ${data.winner}
+          </span>
+        </div>
+        <p class="text-slate-300 text-xs md:text-sm mt-1 leading-relaxed">
+          ${data.why}
+        </p>
+      `;
+    }
+
+    // Tangentbordslyssnare (Piltangenter & Space)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    // Touch swipe-stöd för mobiler
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, false);
+
+    window.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      if (touchStartX - touchEndX > 50) {
+        nextSlide(); // swipe vänster -> gå nästa
+      } else if (touchEndX - touchStartX > 50) {
+        prevSlide(); // swipe höger -> gå föregående
+      }
+    }, false);
+
+    // Initial körning vid sidstart
+    window.onload = function() {
+      updateSlideUI();
+      selectProduct('backpack');
+    };
+  </script>
+</body>
+</html>
